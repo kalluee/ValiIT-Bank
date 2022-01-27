@@ -216,50 +216,43 @@ public class TransactionService {
                 }
                 return requestResult;
 
-            case RECEIVE_MONEY:
-                receiverAccountNumber = transactionDto.getReceiverAccountNumber();
-
-                if (!accountService.accountNumberExists(accounts, receiverAccountNumber)) {
-
-                    requestResult.setError("No such account number exists " + receiverAccountNumber);
-                    return requestResult;
-                }
-
-                AccountDto receiverAccount = accountService.getAccountByNumber((accounts), receiverAccountNumber);
-
-
-
-                // TODO: kontrolli kas account id eksisteerib, kui mitte tagasta error sõnum
-
-                //Arvutame välja uue balance
-                newBalance = balance + amount;
-
-                // täidame ära transactionDto
-                transactionDto.setSenderAccountNumber(ATM);
-                transactionDto.setReceiverAccountNumber(account.getAccountNumber());
-                transactionDto.setBalance(newBalance);
-                transactionDto.setLocalDateTime(LocalDateTime.now());
-                transactionDto.setId(transactionId);
-
-                // lisame tehingu transactionite alla (pluss incrementeerime)
-                bank.addTransactionToTransactions(transactionDto);
-                bank.incrementTransactionId();
-
-                //uuendame konto balancit
-                account.setBalance(newBalance);
-
-                // meisterdame valmis result objekti
-                requestResult.setTransactionId(transactionId);
-                requestResult.setAccountId(accountId);
-                requestResult.setMessage("Successfully made deposit transaction");
-                return requestResult;
 
             default:
                 requestResult.setError("Unknown transaction type: " + transactionType);
                 return requestResult;
 
         }
+    }
 
+    public RequestResult receiveNewTransaction(Bank bank, TransactionDto transactionDto) {
+        RequestResult requestResult = new RequestResult();
+        String receiverAccountNumber = transactionDto.getReceiverAccountNumber();
+        List<AccountDto> accounts = bank.getAccounts();
+
+        if (!accountService.accountNumberExists(accounts, receiverAccountNumber)) {
+            requestResult.setError("No such account in our bank " + receiverAccountNumber);
+            return requestResult;
+        }
+
+        AccountDto receiverAccount = accountService.getAccountByNumber(accounts, receiverAccountNumber);
+        int transactionId = bank.getTransactionIdCount();
+        int receiverNewBalance = receiverAccount.getBalance() + transactionDto.getAmount();
+
+        transactionDto.setTransactionType(RECEIVE_MONEY);
+        transactionDto.setBalance(receiverNewBalance);
+        transactionDto.setId(transactionId);
+        transactionDto.setAccountId(receiverAccount.getBalance());
+        transactionDto.setLocalDateTime(LocalDateTime.now());
+
+        bank.addTransactionToTransactions(transactionDto);
+        bank.incrementTransactionId();
+        receiverAccount.setBalance(receiverNewBalance);
+
+        requestResult.setTransactionId(transactionId);
+        requestResult.setMessage("Transaction received");
+
+
+        return requestResult;
     }
 
 
