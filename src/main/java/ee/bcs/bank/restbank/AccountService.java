@@ -52,13 +52,13 @@ public class AccountService {
                 return account;
             }
         }
-            return null;
+        return null;
 
     }
 
     public boolean accountNumberExists(List<AccountDto> accounts, String receiverAccountNumber) {
-        for(AccountDto account : accounts){
-            if(account.getAccountNumber().equals(receiverAccountNumber)){
+        for (AccountDto account : accounts) {
+            if (account.getAccountNumber().equals(receiverAccountNumber)) {
                 return true;
             }
         }
@@ -67,11 +67,36 @@ public class AccountService {
     }
 
     public AccountDto getAccountByNumber(List<AccountDto> accounts, String receiverAccountNumber) {
-        for(AccountDto account : accounts){
-            if(account.getAccountNumber().equals(receiverAccountNumber)){
+        for (AccountDto account : accounts) {
+            if (account.getAccountNumber().equals(receiverAccountNumber)) {
                 return account;
             }
         }
         return null;
     }
+
+    public RequestResult updateOwnerDetails(List<AccountDto> accounts, AccountDto accountDto) {
+        RequestResult requestResult = new RequestResult();
+
+        int accountId = accountDto.getId();
+        if (!accountIdExist(accounts, accountId)) {
+            requestResult.setError("Account: " + accountId + "does not exist");
+            requestResult.setAccountId(accountId);
+            return requestResult;
+        }
+
+        AccountDto account = getAccountById(accounts, accountId);
+        account.setFirstName(accountDto.getFirstName());
+        account.setLastName(accountDto.getLastName());
+
+            requestResult.setAccountId(accountId);
+            requestResult.setMessage("Succesfully updated account");
+
+        return requestResult;
+    }
+
+
+
+
+
 }
