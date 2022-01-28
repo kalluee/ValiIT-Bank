@@ -90,7 +90,7 @@ public class AccountService {
         account.setLastName(accountDto.getLastName());
 
             requestResult.setAccountId(accountId);
-            requestResult.setMessage("Succesfully updated account");
+            requestResult.setMessage("Successfully updated account");
 
         return requestResult;
     }
