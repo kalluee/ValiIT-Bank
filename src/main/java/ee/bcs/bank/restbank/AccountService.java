@@ -37,7 +37,6 @@ public class AccountService {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -89,8 +88,8 @@ public class AccountService {
         account.setFirstName(accountDto.getFirstName());
         account.setLastName(accountDto.getLastName());
 
-            requestResult.setAccountId(accountId);
-            requestResult.setMessage("Successfully updated account");
+        requestResult.setAccountId(accountId);
+        requestResult.setMessage("Successfully updated account");
 
         return requestResult;
     }
@@ -111,5 +110,27 @@ public class AccountService {
         requestResult.setMessage("Account deleted");
         requestResult.setAccountId(accountId);
         return requestResult;
+    }
+
+    public RequestResult lockStatus(List<AccountDto> accounts, int accountId) {
+        RequestResult requestResult = new RequestResult();
+
+        if (!accountIdExist(accounts, accountId)) {
+            requestResult.setError("Account: " + accountId + "does not exist");
+            requestResult.setAccountId(accountId);
+            return requestResult;
+        }
+
+        AccountDto account = getAccountById((accounts), accountId);
+
+        if (account.getLocked()) {
+            account.setLocked(false);
+            requestResult.setMessage("Account Locked");
+        } else {
+            account.setLocked(true);
+            requestResult.setMessage("Account Unlocked");
+        }
+        requestResult.setAccountId(accountId);
+            return requestResult;
     }
 }

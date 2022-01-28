@@ -69,10 +69,18 @@ public class BankController {
     @PutMapping("/update/owner")
     public RequestResult updateOwnerDetails(@RequestBody AccountDto accountDto) {
         return accountService.updateOwnerDetails(bank.getAccounts(), accountDto);
-
     }
 
+
+
     // TODO: tehke endpoint millega saab konto lukustada/avada. kontrollige ka id olemasolu
+    // lock/status
+
+
+    @PutMapping("/lock/switch")
+    public RequestResult updateLockStatus(@RequestParam int accountId) {
+        return accountService.lockStatus(bank.getAccounts(), accountId);
+    }
 
 
     @DeleteMapping("/delete/account")
