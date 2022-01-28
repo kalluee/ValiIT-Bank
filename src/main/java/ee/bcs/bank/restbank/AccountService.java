@@ -96,7 +96,20 @@ public class AccountService {
     }
 
 
+    public RequestResult deleteAccount(List<AccountDto> accounts, int accountId) {
+        RequestResult requestResult = new RequestResult();
 
+        if (!accountIdExist(accounts, accountId)) {
+            requestResult.setError("Account: " + accountId + "does not exist");
+            requestResult.setAccountId(accountId);
+            return requestResult;
+        }
 
+        AccountDto account = getAccountById(accounts, accountId);
+        accounts.remove(account);
 
+        requestResult.setMessage("Account deleted");
+        requestResult.setAccountId(accountId);
+        return requestResult;
+    }
 }
