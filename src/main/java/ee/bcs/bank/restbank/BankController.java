@@ -3,6 +3,7 @@ package ee.bcs.bank.restbank;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 @RequestMapping("/solution")
@@ -71,26 +72,28 @@ public class BankController {
         return accountService.updateOwnerDetails(bank.getAccounts(), accountDto);
     }
 
-
-
-    // TODO: tehke endpoint millega saab konto lukustada/avada. kontrollige ka id olemasolu
-    // lock/status
-
+    // TODO: tehke endpoint (lock/status), millega saab konto lukustada/avada. kontrollige ka id olemasolu
 
     @PutMapping("/lock/switch")
     public RequestResult updateLockStatus(@RequestParam int accountId) {
-        return accountService.lockStatus(bank.getAccounts(), accountId);
+        return accountService.updateLockStatus(bank.getAccounts(), accountId);
     }
-
 
     @DeleteMapping("/delete/account")
     public RequestResult deleteAccount(@RequestParam int accountId) {
-
         return accountService.deleteAccount(bank.getAccounts(), accountId);
     }
 
-    //  loo transactionService alla uus teenus                                      createTransactionForNewAccount()
-    //  loo bankService alla uus teenus                                             addTransaction()
 
+    @PutMapping("bank/statement/by/last/name")
+    public List<TransactionDto> bankStatementByLastName(@RequestParam String lastName) {
+        return transactionService.getBankStatement(bank, lastName);
+    }
 
 }
+
+
+
+
+
+

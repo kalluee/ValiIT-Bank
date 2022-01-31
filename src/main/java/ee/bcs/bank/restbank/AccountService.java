@@ -2,6 +2,7 @@ package ee.bcs.bank.restbank;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -96,41 +97,56 @@ public class AccountService {
 
 
     public RequestResult deleteAccount(List<AccountDto> accounts, int accountId) {
-        RequestResult requestResult = new RequestResult();
+        RequestResult result = new RequestResult();
 
         if (!accountIdExist(accounts, accountId)) {
-            requestResult.setError("Account: " + accountId + "does not exist");
-            requestResult.setAccountId(accountId);
-            return requestResult;
+            result.setError("Account: " + accountId + "does not exist");
+            result.setAccountId(accountId);
+            return result;
         }
 
         AccountDto account = getAccountById(accounts, accountId);
         accounts.remove(account);
 
-        requestResult.setMessage("Account deleted");
-        requestResult.setAccountId(accountId);
-        return requestResult;
+        result.setMessage("Account deleted");
+        result.setAccountId(accountId);
+        return result;
     }
 
-    public RequestResult lockStatus(List<AccountDto> accounts, int accountId) {
-        RequestResult requestResult = new RequestResult();
-
+    public RequestResult updateLockStatus(List<AccountDto> accounts, int accountId) {
+        RequestResult result = new RequestResult();
+        // Kontrollin, kas konto on olemas, ehk AccountDto klassis (List<AccountDto>) on
+        // nimekiri kontodest (accounts), mille muutujat accountID me otsime.
+        // Kui on olemas, siis väljume tsüklist ja vastame TRUE.
+        //see on vastupidine otsing
         if (!accountIdExist(accounts, accountId)) {
-            requestResult.setError("Account: " + accountId + "does not exist");
-            requestResult.setAccountId(accountId);
-            return requestResult;
+            result.setError("Account " + accountId + " does not exist");
+            result.setAccountId(accountId);
+            return result;
         }
 
-        AccountDto account = getAccountById((accounts), accountId);
+        AccountDto account = getAccountById(accounts, accountId);
+        boolean lockedStatus = account.getLocked();
 
-        if (account.getLocked()) {
+        if (lockedStatus) {
             account.setLocked(false);
-            requestResult.setMessage("Account Locked");
+            result.setMessage("Account is now unlocked");
+            return result;
         } else {
             account.setLocked(true);
-            requestResult.setMessage("Account Unlocked");
+            result.setMessage("Account is now locked");
         }
-        requestResult.setAccountId(accountId);
-            return requestResult;
+        result.setAccountId(accountId);
+        return result;
+    }
+
+    public AccountDto getAccountByLastName(List<AccountDto> accounts, String lastName) {
+
+        for (AccountDto accountDto : accounts) {
+            if (accountDto.getLastName().equals(lastName)) {
+                return accountDto;
+            }
+        }
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -69,7 +70,6 @@ public class TransactionService {
         Character transactionType = transactionDto.getTransactionType();
         Integer amount = transactionDto.getAmount();
         int transactionId = bank.getTransactionIdCount();
-
 
         // pärime välja accountId abiga õige konto ja balance'i
         AccountDto account = accountService.getAccountById(accounts, accountId);
@@ -208,7 +208,6 @@ public class TransactionService {
                     receiverTransactionDto.setAmount(amount);
                     receiverTransactionDto.setTransactionType(RECEIVE_MONEY);
 
-
                     //Lisame tehingu transaktsiooni alla
                     bank.addTransactionToTransactions(receiverTransactionDto);
                     bank.incrementTransactionId();
@@ -216,11 +215,9 @@ public class TransactionService {
                 }
                 return requestResult;
 
-
             default:
                 requestResult.setError("Unknown transaction type: " + transactionType);
                 return requestResult;
-
         }
     }
 
@@ -251,18 +248,24 @@ public class TransactionService {
         requestResult.setTransactionId(transactionId);
         requestResult.setMessage("Transaction received");
 
-
         return requestResult;
     }
 
 
-    // TODO:    createTransactionForNewAccount()
-    //  account number
-    //  balance 0
-    //  amount 0
-    //  transactionType 'n'
-    //  receiver jääb null
-    //  sender jääb null
+    public List<TransactionDto> getBankStatement(Bank bank, String lastName) {
 
+        AccountDto accountByLastName = accountService.getAccountByLastName(bank.getAccounts(), lastName);
 
+        ArrayList<TransactionDto> transactionsByLastName = new ArrayList<>();
+
+        List<TransactionDto> transactions = bank.getTransactions();
+
+        for (TransactionDto transaction : transactions) {
+            if (transaction.getAccountId() == accountByLastName.getId()) {
+                transactionsByLastName.add(transaction);
+            }
+        }
+        return transactionsByLastName;
+    }
 }
+
